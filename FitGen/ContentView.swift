@@ -1,24 +1,15 @@
-//
-//  ContentView.swift
-//  FitGen
-//
-//  Created by Turker on 11.04.2026.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if hasCompletedOnboarding {
+            MainTabView()
+        } else {
+            OnboardingView()
         }
-        .padding()
     }
 }
 
-#Preview {
-    ContentView()
-}
+#Preview { ContentView() }
