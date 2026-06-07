@@ -10,6 +10,67 @@ struct GroqService {
         return await callAPI(messages: payload)
     }
 
+    // MARK: - Training Program Generation (TrainingProgram model)
+
+    static func generateTrainingProgram(profile: UserFitnessProfile) async throws -> TrainingProgram {
+        let prompt = """
+        Return ONLY valid JSON, no markdown, no code blocks, no explanation.
+        Schema:
+        {
+          "id": "string (uuid)",
+          "name": "string (program name)",
+          "durationWeeks": number,
+          "days": [
+            {
+              "id": "string (uuid)",
+              "name": "string (e.g. Push, Pull, Legs)",
+              "exercises": [
+                {
+                  "id": "string (uuid)",
+                  "name": "string",
+                  "sets": number,
+                  "reps": "string (e.g. '8-12')",
+                  "restSeconds": number,
+                  "notes": "string or null"
+                }
+              ]
+            }
+          ]
+        }
+
+        Create a training program for:
+        - Goal: \(profile.goal)
+        - Level: \(profile.level.rawValue)
+        - Training days per week: \(profile.daysPerWeek)
+        - Duration: choose an appropriate number of weeks (4–12)
+
+        Rules:
+        - Exactly \(profile.daysPerWeek) training days in the "days" array
+        - 4–6 exercises per day
+        - All ids must be unique UUID strings
+        - Tailor intensity and volume to the level and goal
+        """
+
+        let payload: [[String: String]] = [
+            ["role": "system", "content": "You are a professional fitness program designer. Always respond with valid JSON only. No explanation, no markdown."],
+            ["role": "user",   "content": prompt]
+        ]
+
+        let raw = await callAPI(messages: payload, jsonMode: true)
+        let jsonString = extractJSON(from: raw)
+
+        guard let data = jsonString.data(using: .utf8) else {
+            throw GeminiError.decodingFailed
+        }
+        do {
+            return try JSONDecoder().decode(TrainingProgram.self, from: data)
+        } catch {
+            print("[Groq] TrainingProgram decode error: \(error)")
+            print("[Groq] Raw JSON: \(jsonString.prefix(500))")
+            throw GeminiError.decodingFailed
+        }
+    }
+
     // MARK: - Program Generation
 
     static func generateProgram(
@@ -46,16 +107,21 @@ struct GroqService {
 
     // MARK: - Private
 
-    private static func callAPI(messages: [[String: String]]) async -> String {
+    private static func callAPI(messages: [[String: String]], jsonMode: Bool = false) async -> String {
         let url = URL(string: "https://api.groq.com/openai/v1/chat/completions")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json",               forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(Constants.groqAPIKey)", forHTTPHeaderField: "Authorization")
-        request.httpBody = try? JSONSerialization.data(withJSONObject: [
+
+        var body: [String: Any] = [
             "model":    "llama-3.3-70b-versatile",
             "messages": messages
-        ])
+        ]
+        if jsonMode {
+            body["response_format"] = ["type": "json_object"]
+        }
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         do {
             let (data, response) = try await URLSession.shared.data(for: request)

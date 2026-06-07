@@ -10,6 +10,8 @@ struct ProfileView: View {
     @AppStorage("userActivity")  private var activityLevel = "Medium"
     @AppStorage("cachedProgram") private var cachedProgram = ""
 
+    @Environment(WorkoutSessionViewModel.self) private var sessionViewModel
+
     @State private var showResetProgram = false
     @State private var showStartOver = false
 
@@ -128,7 +130,10 @@ struct ProfileView: View {
             .confirmationDialog("Reset your program?",
                                 isPresented: $showResetProgram,
                                 titleVisibility: .visible) {
-                Button("Reset Program", role: .destructive) { cachedProgram = "" }
+                Button("Reset Program", role: .destructive) {
+                    cachedProgram = ""
+                    sessionViewModel.reset()
+                }
                 Button("Cancel", role: .cancel) {}
             }
             .confirmationDialog("Start over from scratch?",
@@ -136,7 +141,11 @@ struct ProfileView: View {
                                 titleVisibility: .visible) {
                 Button("Start Over", role: .destructive) {
                     cachedProgram = ""
-                    hasCompletedOnboarding = false
+                    name = ""
+                    sessionViewModel.reset()
+                    DispatchQueue.main.async {
+                        hasCompletedOnboarding = false
+                    }
                 }
                 Button("Cancel", role: .cancel) {}
             }
@@ -144,4 +153,7 @@ struct ProfileView: View {
     }
 }
 
-#Preview { ProfileView() }
+#Preview {
+    ProfileView()
+        .environment(WorkoutSessionViewModel())
+}

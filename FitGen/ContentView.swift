@@ -2,13 +2,17 @@ import SwiftUI
 
 struct ContentView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @State private var sessionViewModel = WorkoutSessionViewModel()
 
     var body: some View {
-        if hasCompletedOnboarding {
-            MainTabView()
-        } else {
-            OnboardingView()
+        Group {
+            if hasCompletedOnboarding {
+                MainTabView()
+            } else {
+                OnboardingView()
+            }
         }
+        .environment(sessionViewModel)
     }
 }
 

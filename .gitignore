@@ -67,3 +67,4 @@ FitGen/Constants.swift
 *.mobileprovision
 Secrets.swift
 Config.xcconfig
+CLAUDE.md

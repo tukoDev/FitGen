@@ -12,14 +12,28 @@ struct ProgramView: View {
     @State private var program: WorkoutProgram?
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var infoExercise: Exercise?
+    @Environment(WorkoutSessionViewModel.self) private var viewModel
+
+    private var currentUserProfile: UserFitnessProfile {
+        let level: FitnessLevel
+        switch activityLevel.lowercased() {
+        case "low":  level = .beginner
+        case "high": level = .advanced
+        default:     level = .intermediate
+        }
+        return UserFitnessProfile(goal: goal, level: level, daysPerWeek: 5)
+    }
 
     var body: some View {
         NavigationView {
             Group {
-                if isLoading {
+                if isLoading || viewModel.isLoadingResponse {
                     loadingView
-                } else if let program = program {
-                    programList(program)
+                } else if let p = viewModel.activeProgram {
+                    trainingProgramList(p)
+                } else if let p = program {
+                    programList(p)
                 } else if let error = errorMessage {
                     errorView(error)
                 } else {
@@ -30,15 +44,17 @@ struct ProgramView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        Task { await regenerate() }
+                        Task {
+                            await viewModel.loadProgram(profile: currentUserProfile, force: true)
+                        }
                     } label: {
                         Label("Regenerate", systemImage: "arrow.clockwise")
                     }
-                    .disabled(isLoading)
+                    .disabled(viewModel.isLoadingResponse)
                 }
             }
         }
-        .task { await loadOrGenerate() }
+        .task { await viewModel.loadProgram(profile: currentUserProfile) }
     }
 
     // MARK: - States
@@ -104,6 +120,80 @@ struct ProgramView: View {
         .listStyle(.insetGrouped)
     }
 
+    private func trainingProgramList(_ p: TrainingProgram) -> some View {
+        List {
+            Section {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(p.name)
+                        .font(.headline)
+                    Text("\(p.durationWeeks) haftalık · \(p.days.count) gün/hafta")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 4)
+            }
+            ForEach(p.days) { day in
+                Section {
+                    ForEach(day.exercises) { exercise in
+                        HStack(spacing: 14) {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.green.opacity(0.15))
+                                .frame(width: 46, height: 46)
+                                .overlay(
+                                    Text(String(exercise.name.prefix(2)).uppercased())
+                                        .font(.caption.bold())
+                                        .foregroundStyle(.green)
+                                )
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(exercise.name)
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                Text("\(exercise.sets) sets · \(exercise.reps) reps · \(exercise.restSeconds)s rest")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button {
+                                infoExercise = exercise
+                            } label: {
+                                Image(systemName: "info.circle")
+                                    .font(.title3)
+                                    .foregroundStyle(.green)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                } header: {
+                    HStack {
+                        Text(day.name)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        Text("\(day.exercises.count) exercises")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Color(.systemGray5))
+                            .clipShape(Capsule())
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .sheet(item: $infoExercise) { ex in
+            ExerciseInfoSheet(
+                exerciseName: ex.name,
+                sets: ex.sets,
+                reps: ex.reps,
+                restSeconds: ex.restSeconds,
+                notes: ex.notes
+            )
+        }
+    }
+
     // MARK: - Logic
 
     private func loadOrGenerate() async {
@@ -115,23 +205,11 @@ struct ProgramView: View {
     }
 
     private func regenerate() async {
-        isLoading = true
-        errorMessage = nil
-        program = nil
-
-        let json = await GroqService.generateProgram(
-            name: name, age: age, weight: weight,
-            height: height, goal: goal, activityLevel: activityLevel
-        )
-        cachedProgramJSON = json
-
-        if let parsed = parse(json) {
-            program = parsed
-        } else {
-            errorMessage = "The AI response could not be parsed. Please try regenerating."
-            cachedProgramJSON = ""
-        }
-        isLoading = false
+        // Groq akışı devre dışı — karşılaştırma için korunuyor
+        // let json = await GroqService.generateProgram(
+        //     name: name, age: age, weight: weight,
+        //     height: height, goal: goal, activityLevel: activityLevel
+        // )
     }
 
     private func parse(_ json: String) -> WorkoutProgram? {
@@ -209,4 +287,7 @@ private struct ExerciseRow: View {
     }
 }
 
-#Preview { ProgramView() }
+#Preview {
+    ProgramView()
+        .environment(WorkoutSessionViewModel())
+}

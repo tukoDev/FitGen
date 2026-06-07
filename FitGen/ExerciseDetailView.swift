@@ -8,6 +8,7 @@ struct ExerciseDetailView: View {
 
     @State private var showVideo = false
     @State private var showFormChecker = false
+    @State private var demoGIF: LibraryExercise?
 
     // Exercises supported by FormCheckerView
     private let formCheckKeywords = [
@@ -63,6 +64,15 @@ struct ExerciseDetailView: View {
                 .padding(18)
                 .background(Color(.secondarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 20))
+
+                // Animated demonstration (matched from the exercise library)
+                if let demoGIF {
+                    ExerciseGIFView(urlString: demoGIF.gifUrl, cornerRadius: 20)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 240)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                }
 
                 // Instructions
                 VStack(alignment: .leading, spacing: 12) {
@@ -127,6 +137,9 @@ struct ExerciseDetailView: View {
         }
         .navigationTitle(exercise.name)
         .navigationBarTitleDisplayMode(.large)
+        .task {
+            demoGIF = await ExerciseStore.shared.resolveMatch(forName: exercise.name)
+        }
         .sheet(isPresented: $showVideo) {
             SafariView(url: youtubeURL)
                 .ignoresSafeArea()

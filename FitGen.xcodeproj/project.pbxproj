@@ -31,6 +31,7 @@
 		B2B8B4F62F8A639200E899D8 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = B2B8B4F52F8A639200E899D8 /* FirebaseRemoteConfig */; };
 		B2B8B4F82F8A639200E899D8 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = B2B8B4F72F8A639200E899D8 /* FirebaseStorage */; };
 		B2B8B4FA2F8A639200E899D8 /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = B2B8B4F92F8A639200E899D8 /* FirebaseStorageCombine-Community */; };
+		CAFE0001CAFE0001CAFE0001 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = CAFE0002CAFE0002CAFE0002 /* SDWebImageSwiftUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,6 +75,7 @@
 				B2B8B4E82F8A639200E899D8 /* FirebaseFunctions in Frameworks */,
 				B2B8B4DA2F8A639200E899D8 /* FirebaseAuth in Frameworks */,
 				B2B8B4E62F8A639200E899D8 /* FirebaseFirestoreCombine-Community in Frameworks */,
+				CAFE0001CAFE0001CAFE0001 /* SDWebImageSwiftUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,6 +150,7 @@
 				B2B8B4F52F8A639200E899D8 /* FirebaseRemoteConfig */,
 				B2B8B4F72F8A639200E899D8 /* FirebaseStorage */,
 				B2B8B4F92F8A639200E899D8 /* FirebaseStorageCombine-Community */,
+				CAFE0002CAFE0002CAFE0002 /* SDWebImageSwiftUI */,
 			);
 			productName = FitGen;
 			productReference = B2B8B4A82F8A5D3F00E899D8 /* FitGen.app */;
@@ -179,6 +182,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				B2B8B4B82F8A60DF00E899D8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				CAFE0003CAFE0003CAFE0003 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B2B8B4A92F8A5D3F00E899D8 /* Products */;
@@ -246,6 +250,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 6A25Y24N7G;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -269,6 +274,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -309,6 +315,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 6A25Y24N7G;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -325,6 +332,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -337,7 +345,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 6A25Y24N7G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "FitGen uses your camera to analyze exercise form in real time using AI pose detection.";
@@ -372,7 +379,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 6A25Y24N7G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "FitGen uses your camera to analyze exercise form in real time using AI pose detection.";
@@ -430,6 +436,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 12.12.0;
+			};
+		};
+		CAFE0003CAFE0003CAFE0003 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -554,6 +568,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B2B8B4B82F8A60DF00E899D8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = "FirebaseStorageCombine-Community";
+		};
+		CAFE0002CAFE0002CAFE0002 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CAFE0003CAFE0003CAFE0003 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
